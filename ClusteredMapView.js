@@ -178,8 +178,7 @@ ClusteredMapView.defaultProps = {
   width: Dimensions.get('window').width,
   height: Dimensions.get('window').height,
   layoutAnimationConf: LayoutAnimation.Presets.spring,
-  edgePadding: { top: 10, left: 10, right: 10, bottom: 10 },
-  provider: undefined
+  edgePadding: { top: 10, left: 10, right: 10, bottom: 10 }
 }
 
 ClusteredMapView.propTypes = {
