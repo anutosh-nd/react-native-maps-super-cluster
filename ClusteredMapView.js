@@ -94,7 +94,7 @@ export default class ClusteredMapView extends PureComponent {
 
   getClusters = (region) => {
     const bbox = regionToBoundingBox(region),
-          viewport = (region.longitudeDelta) >= 40 ? { zoom: this.props.minZoom } : GeoViewport.viewport(bbox, this.dimensions)
+      viewport = (region.longitudeDelta) >= 40 ? { zoom: this.props.minZoom } : GeoViewport.viewport(bbox, this.dimensions)
 
     return this.index.getClusters(bbox, viewport.zoom)
   }
@@ -112,7 +112,7 @@ export default class ClusteredMapView extends PureComponent {
     // //////////////////////////////////////////////////////////////////////////////////
     // get cluster children
     const children = this.index.getLeaves(cluster.properties.cluster_id, this.props.clusterPressMaxChildren),
-          markers = children.map(c => c.properties.item)
+      markers = children.map(c => c.properties.item)
 
     // fit right around them, considering edge padding
     this.mapview.fitToCoordinates(markers.map(m => m.location), { edgePadding: this.props.edgePadding })
@@ -120,12 +120,21 @@ export default class ClusteredMapView extends PureComponent {
     this.props.onClusterPress && this.props.onClusterPress(cluster.properties.cluster_id, markers)
   }
 
+  _onMapReady = () => {
+    if (this.props.onMapReady) {
+      this.props.onMapReady();
+    }
+  }
+
   render() {
     return (
       <MapView
-        { ...this.props}
+        {...this.props}
         ref={this.mapRef}
-        onRegionChangeComplete={this.onRegionChangeComplete}>
+        provider={this.props.provider}
+        onRegionChangeComplete={this.onRegionChangeComplete}
+        onMapReady={Platform.OS === 'android' ? this._onMapReady : null}
+        onLayout={Platform.OS === 'ios' ? this._onMapReady : null}>
         {
           this.props.clusteringEnabled && this.state.data.map((d) => {
             if (d.properties.point_count === 0)
@@ -169,7 +178,8 @@ ClusteredMapView.defaultProps = {
   width: Dimensions.get('window').width,
   height: Dimensions.get('window').height,
   layoutAnimationConf: LayoutAnimation.Presets.spring,
-  edgePadding: { top: 10, left: 10, right: 10, bottom: 10 }
+  edgePadding: { top: 10, left: 10, right: 10, bottom: 10 },
+  provider: undefined
 }
 
 ClusteredMapView.propTypes = {
@@ -193,6 +203,7 @@ ClusteredMapView.propTypes = {
   renderCluster: PropTypes.func,
   onClusterPress: PropTypes.func,
   renderMarker: PropTypes.func.isRequired,
+  onMapReady: PropTypes.func, //called on onMapReady event of map in android and onLayout event in iOS
   // bool
   animateClusters: PropTypes.bool.isRequired,
   clusteringEnabled: PropTypes.bool.isRequired,
@@ -203,4 +214,5 @@ ClusteredMapView.propTypes = {
   layoutAnimationConf: PropTypes.object,
   edgePadding: PropTypes.object.isRequired,
   // string
+  provider: PropTypes.string.isRequired,
 }
