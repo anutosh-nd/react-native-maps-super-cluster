@@ -214,5 +214,5 @@ ClusteredMapView.propTypes = {
   layoutAnimationConf: PropTypes.object,
   edgePadding: PropTypes.object.isRequired,
   // string
-  provider: PropTypes.string.isRequired,
+  provider: PropTypes.string,
 }
